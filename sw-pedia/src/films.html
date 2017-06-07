@@ -9,7 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="./film-card.html">
 <link rel="import" href="shared-styles.html">
+<script src="https://cdn.rawgit.com/cfjedimaster/SWAPI-Wrapper/2c8a87c1/lib/swapi.js"></script>
 
 <dom-module id="my-view1">
   <template>
@@ -19,19 +22,68 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         padding: 10px;
       }
-    </style>
 
-    <div class="card">
-      <div class="circle">1</div>
-      <h1>View One</h1>
-      <p>Ut labores minimum atomorum pro. Laudem tibique ut has.</p>
-      <p>Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Lorem ipsum dolor sit amet, per in nusquam nominavi periculis, sit elit oportere ea.Cu mei vide viris gloriatur, at populo eripuit sit.</p>
-    </div>
+    </style>
+    <iron-ajax
+      auto
+      url="http://swapi.co/api/films"
+      handle-as="json"
+      on-response="handleResponse"
+      debounce-duration="300">
+    </iron-ajax>
+
+    <template is="dom-if" if='{{_isSingleFilm()}}'>
+      <film-card film="{{currentFilm}}"></film-card>
+    </template>
+
+    <template is="dom-if" if='{{!_isSingleFilm()}}'>
+      <template is="dom-repeat" items="{{films}}" as="film">
+        <film-card film="{{film}}"><film-card>
+      </template>
+    </template>
+
   </template>
 
   <script>
     Polymer({
       is: 'my-view1',
+      attached: function () {
+        // El tail tiene 3 propiedades:
+        // Prefix: Toda la ruta canon, especificada en <app-route>
+        // tail: Información adicional a la ruta Canon
+        // __queryParams: toda información de filtros especiales
+        // ubicados después del ? en una url
+        var swapi = swapiModule,
+          that = this;
+
+        if(this._isSingleFilm) {
+          var tail = document
+            .querySelector('my-app')
+            .root.querySelector('app-route')
+            .tail.path,
+          filmId = tail.substr(tail.length - 1);
+
+          swapi.getFilm(filmId, function(film) {
+            that.currentFilm = film;
+          });
+        }
+
+      },
+      _isSingleFilm: function () {
+        var filmId = document
+          .querySelector('my-app').root
+          .querySelector('app-route')
+          .tail.path;
+
+        if (filmId && filmId !=='/') {
+          return  true;
+        } else {
+          return false;
+        }
+      },
+      handleResponse: function (response) {
+        this.films = response.detail.response.results;
+      }
     });
   </script>
 </dom-module>

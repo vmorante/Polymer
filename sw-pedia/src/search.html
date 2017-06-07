@@ -1,0 +1,68 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<script src="https://cdn.rawgit.com/cfjedimaster/SWAPI-Wrapper/2c8a87c1/lib/swapi.js"></script>
+<script src="../bower_components/request/request.js"></script>
+
+
+
+
+
+<dom-module id="my-view3 ">
+    <template>
+    <style include="shared-styles ">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card ">
+      <paper-input id="character "always-float-label label="Floating label "></paper-input>
+      <paper-button id="find " on-tap="findCharacter"raised>Buscar</paper-button>
+  </template>
+
+    <template id="dom-repeat" items={{results}} as="result">
+      <character-card character={{result}}></character-card>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'my-view3',
+            attached: function() {
+
+            },
+            findCharacter: function(e) {
+                var who = this.root.querySelector('#character').value,
+                    request = this.root.querySelector('iron-ajax');
+
+                request.url = 'https://swapi.co/api/people/'.concat('?search=', who)
+                console.log(request.url);
+            },
+            handleResponse: function(response) {
+                if (this.results.length > 1) {
+                    this.results = response.detail.response.results;
+                } else {
+                    this.noResults = true;
+                }
+            },
+            AreThereResults: function() {
+                console.log('e')
+                return this.noResults;
+            }
+        });
+    </script>
+</dom-module>
