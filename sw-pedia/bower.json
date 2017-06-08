@@ -19,10 +19,10 @@
     "paper-card": "PolymerElements/paper-card#^2.0.0",
     "paper-button": "PolymerElements/paper-button#^2.0.0",
     "iron-icons": "PolymerElements/iron-icons#^2.0.0",
-    "paper-dialog": "polymerElements/paper-dialog#^2.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "ramda": "^0.24.1",
     "paper-chip": "bendavis78/paper-chip#^1.1.2",
-    "paper-input": "polymerElements/paper-input#^2.0.0",
+    "paper-input": "PolymerElements/paper-input#^2.0.0",
     "request": "^2.81.1"
   },
   "devDependencies": {

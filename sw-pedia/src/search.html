@@ -10,19 +10,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
-<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="./character-card.html">
 <script src="https://cdn.rawgit.com/cfjedimaster/SWAPI-Wrapper/2c8a87c1/lib/swapi.js"></script>
-<script src="../bower_components/request/request.js"></script>
 
 
-
-
-
-<dom-module id="my-view3 ">
-    <template>
-    <style include="shared-styles ">
+<dom-module id="my-view3">
+  <template>
+    <style include="shared-styles">
       :host {
         display: block;
 
@@ -30,39 +28,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <div class="card ">
-      <paper-input id="character "always-float-label label="Floating label "></paper-input>
-      <paper-button id="find " on-tap="findCharacter"raised>Buscar</paper-button>
-  </template>
+    <iron-ajax
+      auto
+      handle-as="json"
+      on-response="handleResponse"
+      debounce-duration="300">
+    </iron-ajax>
 
-    <template id="dom-repeat" items={{results}} as="result">
+    <div class="card">
+      <paper-input id="character" always-float-label label="Escribe un personaje "></paper-input>
+      <paper-button id="find" on-tap="findCharacter" raised>buscar</paper-button>
+    </div>
+
+    <template is="dom-if" if={{areThereResults}}>
+      <h1>Lo siento, ese personaje, no es de Star Wars</h1>
+      <h4>(O es de Rogue One)</h4>
+    </template>
+
+    <template is="dom-repeat" items={{results}} as=result>
       <character-card character={{result}}></character-card>
     </template>
 
-    <script>
-        Polymer({
-            is: 'my-view3',
-            attached: function() {
+  </template>
 
-            },
-            findCharacter: function(e) {
-                var who = this.root.querySelector('#character').value,
-                    request = this.root.querySelector('iron-ajax');
+  <script>
+    Polymer({
+      is: 'my-view3',
+      properties: {
+        areThereResults: {
+          type: Boolean,
+          notify: true,
+          reflectToAttribute: true
+        }
+      },
+      findCharacter: function () {
+        var who = this.root.querySelector('#character').value,
+          request = this.root.querySelector('iron-ajax');
 
-                request.url = 'https://swapi.co/api/people/'.concat('?search=', who)
-                console.log(request.url);
-            },
-            handleResponse: function(response) {
-                if (this.results.length > 1) {
-                    this.results = response.detail.response.results;
-                } else {
-                    this.noResults = true;
-                }
-            },
-            AreThereResults: function() {
-                console.log('e')
-                return this.noResults;
-            }
-        });
-    </script>
+          request.url = 'https://swapi.co/api/people/'.concat('?search=', who)
+      },
+      handleResponse: function (response) {
+        this.results = response.detail.response.results;
+        if (this.results.length >= 1) {
+          this.areThereResults = false;
+        } else {
+          this.areThereResults = true;
+        }
+      }
+    });
+  </script>
 </dom-module>
